@@ -1,59 +1,67 @@
-@extends('layouts.app')
+<x-app-layout>
+    <x-slot name="header">
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+            Export to Excel
+        </h2>
+    </x-slot>
 
-@section('title', 'Export to Excel')
-
-@section('content')
-    <h1>Export to Excel</h1>
-    <p class="lede">Filters apply to when the row was captured (submission time). Combine filters to narrow the download. Leave all empty to export everything.</p>
-
-    <div class="card">
-        @if ($errors->any())
-            <div class="alert alert-error">
-                <ul style="margin:0;padding-left:1.25rem;">
-                    @foreach ($errors->all() as $e)
-                        <li>{{ $e }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
-
-        <form method="get" action="{{ route('submissions.export') }}">
-            <div class="field">
-                <label for="capture_date">Submitted on (single day)</label>
-                <input type="date" id="capture_date" name="capture_date" value="{{ old('capture_date', request('capture_date')) }}">
-                <p class="hint">Rows created on this calendar day (server time).</p>
-            </div>
-
-            <div class="field">
-                <label for="month">Submitted in month</label>
-                <input type="month" id="month" name="month" value="{{ old('month', request('month')) }}">
-                <p class="hint">Use with or without the single-day filter.</p>
-            </div>
-
-            <div class="row2">
-                <div class="field">
-                    <label for="date_from">From date (range)</label>
-                    <input type="date" id="date_from" name="date_from" value="{{ old('date_from', request('date_from')) }}">
+    <div class="py-12">
+        <div class="max-w-3xl mx-auto sm:px-6 lg:px-8">
+            @if ($errors->any())
+                <div class="mb-4 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
+                    <ul class="list-disc pl-5">
+                        @foreach ($errors->all() as $e)
+                            <li>{{ $e }}</li>
+                        @endforeach
+                    </ul>
                 </div>
-                <div class="field">
-                    <label for="date_to">To date (range)</label>
-                    <input type="date" id="date_to" name="date_to" value="{{ old('date_to', request('date_to')) }}">
+            @endif
+
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="p-6 text-gray-900">
+                    <p class="mb-4 text-sm text-gray-600">
+                        Filters apply to when the row was captured (submission time). Leave all fields empty to export everything.
+                    </p>
+
+                    <form method="get" action="{{ route('submissions.export') }}" class="space-y-4">
+                        <div>
+                            <x-input-label for="capture_date" value="Submitted on (single day)" />
+                            <x-text-input id="capture_date" name="capture_date" type="date" class="mt-1 block w-full" value="{{ old('capture_date', request('capture_date')) }}" />
+                        </div>
+
+                        <div>
+                            <x-input-label for="month" value="Submitted in month" />
+                            <x-text-input id="month" name="month" type="month" class="mt-1 block w-full" value="{{ old('month', request('month')) }}" />
+                        </div>
+
+                        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                            <div>
+                                <x-input-label for="date_from" value="From date (range)" />
+                                <x-text-input id="date_from" name="date_from" type="date" class="mt-1 block w-full" value="{{ old('date_from', request('date_from')) }}" />
+                            </div>
+                            <div>
+                                <x-input-label for="date_to" value="To date (range)" />
+                                <x-text-input id="date_to" name="date_to" type="date" class="mt-1 block w-full" value="{{ old('date_to', request('date_to')) }}" />
+                            </div>
+                        </div>
+
+                        <div>
+                            <x-input-label for="fund_name" value="Fund name contains" />
+                            <x-text-input id="fund_name" name="fund_name" type="text" class="mt-1 block w-full" value="{{ old('fund_name', request('fund_name')) }}" list="export-funds" placeholder="e.g. Growth" />
+                            <datalist id="export-funds">
+                                @foreach ($funds as $f)
+                                    <option value="{{ $f }}"></option>
+                                @endforeach
+                            </datalist>
+                        </div>
+
+                        <div class="pt-2 flex items-center gap-3">
+                            <x-primary-button>Download .xlsx</x-primary-button>
+                            <a href="{{ route('submissions.create') }}" class="text-sm text-gray-600 hover:text-gray-900">Cancel</a>
+                        </div>
+                    </form>
                 </div>
             </div>
-            <p class="hint">Range is inclusive, based on submission date.</p>
-
-            <div class="field">
-                <label for="fund_name">Fund name contains</label>
-                <input type="text" id="fund_name" name="fund_name" value="{{ old('fund_name', request('fund_name')) }}" list="export-funds" placeholder="e.g. Growth">
-                <datalist id="export-funds">
-                    @foreach ($funds as $f)
-                        <option value="{{ $f }}">
-                    @endforeach
-                </datalist>
-            </div>
-
-            <button type="submit" class="btn">Download .xlsx</button>
-            <a href="{{ route('submissions.create') }}" class="btn btn-secondary" style="margin-left:0.5rem;">Cancel</a>
-        </form>
+        </div>
     </div>
-@endsection
+</x-app-layout>
